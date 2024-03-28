@@ -1,8 +1,8 @@
-#include "../lib/TXLib.h"
+#include "graphics.h"
 
 int main (const int argc, const char *argv[]) {
 
-    txCreateWindow (800, 600);
+    MandelbrotDraw();
 
     return 0;
 }

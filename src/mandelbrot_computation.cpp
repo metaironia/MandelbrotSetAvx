@@ -51,9 +51,7 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem) {
     for (size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++, y_0 += DELTA_Y) {
         
         float x_0[ACCUM_NUM] = {OFFSET_AXIS_X,               OFFSET_AXIS_X + DELTA_X, 
-                                OFFSET_AXIS_X + DELTA_X * 2, OFFSET_AXIS_X + DELTA_X * 3,
-                                OFFSET_AXIS_X + DELTA_X * 4, OFFSET_AXIS_X + DELTA_X * 5,
-                                OFFSET_AXIS_X + DELTA_X * 6, OFFSET_AXIS_X + DELTA_X * 7};
+                                OFFSET_AXIS_X + DELTA_X * 2, OFFSET_AXIS_X + DELTA_X * 3};
             
         for (size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
 
@@ -69,7 +67,7 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem) {
             size_t iter_num[ACCUM_NUM] = {};
 
             int pixel_mask           = 0;
-            int is_dot_in[ACCUM_NUM] = {0};
+            int is_dot_in[ACCUM_NUM] = {};
 
             FOR_ACCUM
                 is_dot_in[i] = 1;

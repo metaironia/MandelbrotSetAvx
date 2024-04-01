@@ -51,7 +51,9 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem) {
     for (size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++, y_0 += DELTA_Y) {
         
         float x_0[ACCUM_NUM] = {OFFSET_AXIS_X,               OFFSET_AXIS_X + DELTA_X, 
-                                OFFSET_AXIS_X + DELTA_X * 2, OFFSET_AXIS_X + DELTA_X * 3};
+                                OFFSET_AXIS_X + DELTA_X * 2, OFFSET_AXIS_X + DELTA_X * 3,
+                                OFFSET_AXIS_X + DELTA_X * 4, OFFSET_AXIS_X + DELTA_X * 5,
+                                OFFSET_AXIS_X + DELTA_X * 6, OFFSET_AXIS_X + DELTA_X * 7};
             
         for (size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
 
@@ -65,6 +67,12 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem) {
                 y[i] = y_0;
 
             size_t iter_num[ACCUM_NUM] = {};
+
+            int pixel_mask           = 0;
+            int is_dot_in[ACCUM_NUM] = {0};
+
+            FOR_ACCUM
+                is_dot_in[i] = 1;
 
             for (size_t curr_iter = 0; curr_iter <= MAX_COMPUTATION_NUM; curr_iter++) {
                 
@@ -81,18 +89,14 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem) {
                 FOR_ACCUM
                     curr_xy[i] = x[i] * y[i];
 
-                int pixel_mask = 0;
-
-                int is_dot_out[ACCUM_NUM] = {};
-
                 FOR_ACCUM
                     if ((curr_x_sq[i] + curr_y_sq[i]) > MANDELBROT_RADIUS_SQUARE)
-                        is_dot_out[i] = 1;
+                        is_dot_in[i] = 0;
                 
                 FOR_ACCUM
-                    pixel_mask |= (is_dot_out[i] << i);
+                    pixel_mask |= (is_dot_in[i] << i);
 
-                if (!(pixel_mask ^ ACCUM_MASK))
+                if (!pixel_mask)
                     break;
 
                 FOR_ACCUM
@@ -102,7 +106,7 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem) {
                     y[i] = 2 * curr_xy[i] + y_0; 
 
                 FOR_ACCUM
-                    iter_num[i] += 1 - is_dot_out[i];
+                    iter_num[i] += is_dot_in[i];
             }
 
             FOR_ACCUM

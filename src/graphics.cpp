@@ -14,25 +14,34 @@ GraphicsFunc MandelbrotDraw (void) {
     assert (vmem_buffer);
 
     Win32::_fpreset();
-    txBegin();
 
-    MandelbrotComputeSensibleNoSIMD (vmem_buffer);
+    ComputationConfig config = {};
+    ConfigCtor (&config);
 
-    txEnd();
+    if (1) {
+        /* if (txGetAsyncKeyState (VK_LEFT)) {
 
-    txSleep (5000);
 
-    txBegin();
+        }
 
-    MandelbrotComputeSillyNoSIMD (vmem_buffer);
+        if (txGetAsyncKeyState (VK_RIGHT))
+        if (txGetAsyncKeyState (VK_UP))
+        if (txGetAsyncKeyState (VK_DOWN)) */
 
-    txEnd();
+        txBegin();
+
+        MandelbrotComputeSIMD (vmem_buffer, &config);
+
+        txEnd();
+    }
+
+    ConfigDtor (&config);
 
     return GRAPHICS_FUNC_STATUS_OK;
 }
 
-GraphicsFunc PixelColorSet (RGBQUAD *videomem, size_t pixel_x, 
-                            size_t pixel_y,    const size_t iter_num) {
+GraphicsFunc PixelColorSet (RGBQUAD *videomem,       size_t pixel_x, 
+                            size_t   pixel_y,  const size_t iter_num) {
 
     assert (videomem);
 

@@ -14,7 +14,7 @@ enum GraphicsFunc {
 
 GraphicsFunc MandelbrotDraw (void);
 
-GraphicsFunc PixelColorSet (RGBQUAD *videomem, size_t pixel_x, 
-                            size_t pixel_y,    const size_t iter_num);
+GraphicsFunc PixelColorSet (RGBQUAD *videomem,       size_t pixel_x, 
+                            size_t   pixel_y,  const size_t iter_num);
 
 #endif

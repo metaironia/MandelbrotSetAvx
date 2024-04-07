@@ -1,10 +1,15 @@
+#include <stdio.h>
+
 #include <windows.h>
 #include <assert.h>
+#include <stdint.h>
+#include <immintrin.h>
 
 #include "graphics.h"
 #include "mandelbrot_computation.h"
 
 #define FOR_ACCUM  for (size_t i = 0; i < ACCUM_NUM; i++)
+
 ComputationFunc MandelbrotComputeSillyNoSIMD (RGBQUAD *videomem) {
 
     assert (videomem);
@@ -113,6 +118,57 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem) {
             FOR_ACCUM
                 x_0[i] += ACCUM_NUM * DELTA_X;
         }
+    }
+
+    return COMPUTATION_FUNC_STATUS_OK;
+}
+
+ComputationFunc MandelbrotComputeSIMD (RGBQUAD *videomem) {
+
+    assert (videomem);
+
+    __m256d y_0 = _mm256_set1_pd (OFFSET_AXIS_Y);
+
+    for (size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++) {
+        
+        __m256d x_0 = _mm256_set1_pd (OFFSET_AXIS_X);
+                x_0 = _mm256_add_pd  (x_0, _mm256_mul_pd (INTR_DELTA_X, INTR_0_TO_3));
+
+        for (size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
+
+            __m256d x = _mm256_movedup_pd (x_0);
+            __m256d y = _mm256_movedup_pd (y_0);
+
+            __m256i iter_num = _mm256_set1_epi64x (0);
+
+            for (size_t curr_iter = 0; curr_iter <= MAX_COMPUTATION_NUM; curr_iter++) {
+                
+                __m256d curr_x_sq      = _mm256_mul_pd (x, x);
+                __m256d curr_y_sq      = _mm256_mul_pd (y, y);
+                __m256d curr_xy        = _mm256_mul_pd (x, y); 
+                __m256d curr_x_sq_y_sq = _mm256_add_pd (curr_x_sq, curr_y_sq);
+
+                __m256d is_dot_in = _mm256_cmp_pd (curr_x_sq_y_sq, INTR_MAND_RAD_SQ, _CMP_LT_OQ);
+
+                if (!(_mm256_movemask_pd (is_dot_in)))
+                    break;
+
+                x = _mm256_add_pd (_mm256_sub_pd (curr_x_sq, curr_y_sq),    x_0);      
+                y = _mm256_add_pd (_mm256_mul_pd (INTR_CONST_TWO, curr_xy), y_0);
+
+                __m256i sum_mask = _mm256_srli_epi64 (_mm256_castpd_si256 (is_dot_in), 8 * sizeof (double) - 1); 
+                        iter_num = _mm256_add_epi64  (sum_mask, iter_num);
+            }
+
+            int64_t *pixel_iter_num = (int64_t *) (&iter_num); 
+
+            FOR_ACCUM
+                PixelColorSet (videomem, x_pixel + i, y_pixel, pixel_iter_num[i]);
+
+            x_0 = _mm256_add_pd (x_0, INTR_STEP_X);
+        }
+
+        y_0 = _mm256_add_pd (y_0, INTR_DELTA_Y);
     }
 
     return COMPUTATION_FUNC_STATUS_OK;

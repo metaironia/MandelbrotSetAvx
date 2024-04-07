@@ -1,5 +1,6 @@
 .PHONY: all clean rebuild
 CC=g++
+CFLAGS = -mavx -mavx2
 WARNINGS=-Wshadow -Winit-self -Wcast-align -Wundef -Wfloat-equal -Winline -Wredundant-decls \
  	 -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default \
 	 -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion -Wctor-dtor-privacy \
@@ -17,7 +18,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(WARNINGS) $^ -o $@
 
 %.o : %.cpp %.h
-	$(CC) -c $(WARNINGS) $< -o $@                    
+	$(CC) -c $(CFLAGS) $(WARNINGS) $< -o $@                    
 
 clean:
 	 rm -f *.o mandelbrot.exe

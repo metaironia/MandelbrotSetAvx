@@ -3,6 +3,8 @@
 
 #include <windows.h>
 
+#include "mandelbrot_computation.h"
+
 const int WINDOW_SIZE_X = 800;
 const int WINDOW_SIZE_Y = 600;
 
@@ -13,6 +15,8 @@ enum GraphicsFunc {
 };
 
 GraphicsFunc MandelbrotDraw (void);
+
+inline GraphicsFunc ControlButtonPressCheck (ComputationConfig *config);
 
 GraphicsFunc PixelColorSet (RGBQUAD *videomem,       size_t pixel_x, 
                             size_t   pixel_y,  const size_t iter_num);

@@ -5,6 +5,7 @@
 
 #include "mandelbrot_computation.h"
 #include "graphics.h"
+#include "dsl.h"
 
 GraphicsFunc MandelbrotDraw (void) {
 
@@ -18,15 +19,9 @@ GraphicsFunc MandelbrotDraw (void) {
     ComputationConfig config = {};
     ConfigCtor (&config);
 
-    if (1) {
-        /* if (txGetAsyncKeyState (VK_LEFT)) {
-
-
-        }
-
-        if (txGetAsyncKeyState (VK_RIGHT))
-        if (txGetAsyncKeyState (VK_UP))
-        if (txGetAsyncKeyState (VK_DOWN)) */
+    while (!txGetAsyncKeyState (VK_ESCAPE)) {
+        
+        ControlButtonPressCheck (&config);
 
         txBegin();
 
@@ -34,8 +29,63 @@ GraphicsFunc MandelbrotDraw (void) {
 
         txEnd();
     }
-
+ 
     ConfigDtor (&config);
+
+    return GRAPHICS_FUNC_STATUS_OK;
+}
+
+inline GraphicsFunc ControlButtonPressCheck (ComputationConfig *config) {
+
+    assert (config);
+
+    if (txGetAsyncKeyState (VK_LEFT)) {
+
+        NUM_OFFSET_AXIS_X_ -= NUM_DELTA_X_ * 10;
+        INTR_OFFSET_AXIS_X_ = _mm256_sub_pd (INTR_OFFSET_AXIS_X_, _mm256_mul_pd (INTR_DELTA_X_, INTR_CONST_TEN));
+    }
+
+    if (txGetAsyncKeyState (VK_RIGHT)) {
+
+        NUM_OFFSET_AXIS_X_ += NUM_DELTA_X_ * 10;
+        INTR_OFFSET_AXIS_X_ = _mm256_add_pd (INTR_OFFSET_AXIS_X_, _mm256_mul_pd (INTR_DELTA_X_, INTR_CONST_TEN));
+    }
+
+    if (txGetAsyncKeyState (VK_UP)) {
+
+        NUM_OFFSET_AXIS_Y_ += NUM_DELTA_Y_ * 10;
+        INTR_OFFSET_AXIS_Y_ = _mm256_add_pd (INTR_OFFSET_AXIS_Y_, _mm256_mul_pd (INTR_DELTA_Y_, INTR_CONST_TEN));
+    }
+
+    if (txGetAsyncKeyState (VK_DOWN)) {
+
+        NUM_OFFSET_AXIS_Y_ -= NUM_DELTA_Y_ * 10;
+        INTR_OFFSET_AXIS_Y_ = _mm256_sub_pd (INTR_OFFSET_AXIS_Y_, _mm256_mul_pd (INTR_DELTA_Y_, INTR_CONST_TEN));
+    }
+
+    if (txGetAsyncKeyState (VK_F1)) {
+
+        NUM_DELTA_Y_ *= 2;
+        INTR_DELTA_Y_ = _mm256_mul_pd (INTR_DELTA_Y_, INTR_CONST_TWO); 
+
+        NUM_DELTA_X_ *= 2;
+        INTR_DELTA_X_ = _mm256_mul_pd (INTR_DELTA_X_, INTR_CONST_TWO);
+
+        NUM_STEP_X_ *= 2;
+        INTR_STEP_X_ = _mm256_mul_pd (INTR_STEP_X_, INTR_CONST_TWO);
+    }
+
+    if (txGetAsyncKeyState (VK_F2)) {
+
+        NUM_DELTA_Y_ /= 2;
+        INTR_DELTA_Y_ = _mm256_div_pd (INTR_DELTA_Y_, INTR_CONST_TWO); 
+
+        NUM_DELTA_X_ /= 2;
+        INTR_DELTA_X_ = _mm256_div_pd (INTR_DELTA_X_, INTR_CONST_TWO);
+
+        NUM_STEP_X_ /= 2;
+        INTR_STEP_X_ = _mm256_div_pd (INTR_STEP_X_, INTR_CONST_TWO);
+    }
 
     return GRAPHICS_FUNC_STATUS_OK;
 }

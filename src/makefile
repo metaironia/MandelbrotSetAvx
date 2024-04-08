@@ -7,8 +7,7 @@ WARNINGS=-Wshadow -Winit-self -Wcast-align -Wundef -Wfloat-equal -Winline -Wredu
 	 -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op -Wno-missing-field-initializers \
 	 -Wnon-virtual-dtor -Woverloaded-virtual -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing \
 	 -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG -D_EJUDGE_CLIENT_SIDE 
-SOURCES= main.cpp graphics.cpp mandelbrot_computation.cpp
-		 		 
+SOURCES= main.cpp graphics.cpp mandelbrot_computation.cpp		 		 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=mandelbrot
 
@@ -17,7 +16,7 @@ all: $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(WARNINGS) $^ -o $@
 
-%.o : %.cpp %.h
+%.o : %.cpp
 	$(CC) -c $(CFLAGS) $(WARNINGS) $< -o $@                    
 
 clean:

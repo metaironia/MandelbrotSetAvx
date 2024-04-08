@@ -12,14 +12,14 @@ enum ComputationFunc {
 
 const int ACCUM_NUM = 4;
 
-const float DEFAULT_DELTA_X = 3.f / 800;
-const float DEFAULT_DELTA_Y = 3.f / 800;
-const float DEFAULT_STEP_X  = DEFAULT_DELTA_X * ACCUM_NUM;
+const double DEFAULT_DELTA_X = 3.f / 800;
+const double DEFAULT_DELTA_Y = 3.f / 800;
+const double DEFAULT_STEP_X  = DEFAULT_DELTA_X * ACCUM_NUM;
 
-const float DEFAULT_OFFSET_AXIS_X = -2.f;
-const float DEFAULT_OFFSET_AXIS_Y = -1.f;
+const double DEFAULT_OFFSET_AXIS_X = -2.f;
+const double DEFAULT_OFFSET_AXIS_Y = -1.f;
 
-const float MANDELBROT_RADIUS_SQUARE = 100.f;
+const double MANDELBROT_RADIUS_SQUARE = 100.f;
 const int   MAX_COMPUTATION_NUM      = 256;
 
 const __m256d INTR_MAND_RAD_SQ = _mm256_set1_pd (MANDELBROT_RADIUS_SQUARE);

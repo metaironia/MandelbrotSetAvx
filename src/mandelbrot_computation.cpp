@@ -184,13 +184,12 @@ ComputationFunc MandelbrotComputeSIMD (RGBQUAD *videomem, ComputationConfig *con
 
     for (size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++) {
         
-        __m256d x_0 = INTR_OFFSET_AXIS_X_;
-                x_0 = _mm256_add_pd  (x_0, _mm256_mul_pd (INTR_DELTA_X_, INTR_0_TO_3));
+        __m256d x_0 = _mm256_add_pd (INTR_OFFSET_AXIS_X_, _mm256_mul_pd (INTR_DELTA_X_, INTR_0_TO_3));
 
         for (size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
 
-            __m256d x = _mm256_movedup_pd (x_0);
-            __m256d y = _mm256_movedup_pd (y_0);
+            __m256d x = x_0;
+            __m256d y = y_0;
 
             __m256i iter_num = _mm256_set1_epi64x (0);
 
@@ -202,7 +201,6 @@ ComputationFunc MandelbrotComputeSIMD (RGBQUAD *videomem, ComputationConfig *con
                 __m256d curr_x_sq_y_sq = _mm256_add_pd (curr_x_sq, curr_y_sq);
 
                 __m256d is_dot_in = _mm256_cmp_pd (curr_x_sq_y_sq, INTR_MAND_RAD_SQ, _CMP_LT_OQ);
-                                                  
 
                 if (!(_mm256_movemask_pd (is_dot_in)))
                     break;

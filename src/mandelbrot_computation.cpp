@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 #include <immintrin.h>
 
 #include "graphics.h"
@@ -14,6 +15,14 @@
 ComputationFunc ConfigCtor (ComputationConfig *config) {
 
     assert (config);
+
+    ConfigDataCtor (config);
+
+    return COMPUTATION_FUNC_STATUS_OK;
+}
+
+ComputationFunc ConfigDataCtor (ComputationConfig *config) {
+
     assert (config);
 
     (config -> numbers_config).delta_x          = DEFAULT_DELTA_X; 
@@ -31,11 +40,20 @@ ComputationFunc ConfigCtor (ComputationConfig *config) {
     return COMPUTATION_FUNC_STATUS_OK;
 }
 
+ComputationFunc ConfigDataDtor (ComputationConfig *config) {
+    
+    assert (config);
+
+    memset (config, 0, sizeof (ComputationConfig));
+
+    return COMPUTATION_FUNC_STATUS_OK;
+}
+
 ComputationFunc ConfigDtor (ComputationConfig *config) {
 
     assert (config);
 
-    memset (config, 0, sizeof (ComputationConfig));
+    ConfigDataDtor (config);
 
     return COMPUTATION_FUNC_STATUS_OK;
 }
@@ -160,6 +178,7 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem, ComputationC
 ComputationFunc MandelbrotComputeSIMD (RGBQUAD *videomem, ComputationConfig *config) {
 
     assert (videomem);
+    assert (config);
 
     __m256d y_0 = INTR_OFFSET_AXIS_Y_;
 

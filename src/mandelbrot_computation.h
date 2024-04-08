@@ -4,8 +4,6 @@
 #include <windows.h>
 #include <immintrin.h>
 
-#include "graphics.h"
-
 enum ComputationFunc {
 
     COMPUTATION_FUNC_STATUS_OK,
@@ -27,6 +25,7 @@ const int   MAX_COMPUTATION_NUM      = 256;
 const __m256d INTR_MAND_RAD_SQ = _mm256_set1_pd (MANDELBROT_RADIUS_SQUARE);
 
 const __m256d INTR_CONST_TWO = _mm256_set1_pd (2.0);
+const __m256d INTR_CONST_TEN = _mm256_set1_pd (10.0);
 const __m256d INTR_0_TO_3    = _mm256_setr_pd (0.0, 1.0, 2.0, 3.0);
 
 struct ComputationConfig {
@@ -51,6 +50,10 @@ struct ComputationConfig {
 };
 
 ComputationFunc ConfigCtor (ComputationConfig *config);
+
+ComputationFunc ConfigDataCtor (ComputationConfig *config);
+
+ComputationFunc ConfigDataDtor (ComputationConfig *config);
 
 ComputationFunc ConfigDtor (ComputationConfig *config);
 

@@ -1,6 +1,6 @@
-.PHONY: all clean rebuild
+.PHONY: all clean rebuild benchmark
 CC=g++
-CFLAGS = -mavx -mavx2
+CFLAGS = -mavx -mavx2 -O3
 WARNINGS=-Wshadow -Winit-self -Wcast-align -Wundef -Wfloat-equal -Winline -Wredundant-decls \
  	 -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default \
 	 -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion -Wctor-dtor-privacy \
@@ -10,6 +10,9 @@ WARNINGS=-Wshadow -Winit-self -Wcast-align -Wundef -Wfloat-equal -Winline -Wredu
 SOURCES= main.cpp graphics.cpp mandelbrot_computation.cpp		 		 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=mandelbrot
+
+benchmark: CFLAGS += -DBENCHMARK
+benchmark: rebuild
 
 all: $(EXECUTABLE)
 
@@ -22,6 +25,7 @@ $(EXECUTABLE): $(OBJECTS)
 clean:
 	 rm -f *.o mandelbrot.exe
 
-rebuild:
-	make clean
-	make all
+rebuild: clean all
+
+
+

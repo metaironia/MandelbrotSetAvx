@@ -2,13 +2,19 @@
 #define MANDELBROT_COMPUTATION_H
 
 #include <windows.h>
+#include <stdio.h>
+#include <stdint.h>
 #include <immintrin.h>
+
+#define FOR_ACCUM  for (size_t i = 0; i < ACCUM_NUM; i++)
 
 enum ComputationFunc {
 
     COMPUTATION_FUNC_STATUS_OK,
     COMPUTATION_FUNC_STATUS_FAIL
 };
+
+const int BENCHMARK_COMPUTE_TIMES = 1000;
 
 const int ACCUM_NUM = 4;
 
@@ -20,7 +26,7 @@ const double DEFAULT_OFFSET_AXIS_X = -2.f;
 const double DEFAULT_OFFSET_AXIS_Y = -1.f;
 
 const double MANDELBROT_RADIUS_SQUARE = 100.f;
-const int   MAX_COMPUTATION_NUM      = 256;
+const int    MAX_COMPUTATION_NUM      = 256;
 
 const __m256d INTR_MAND_RAD_SQ = _mm256_set1_pd (MANDELBROT_RADIUS_SQUARE);
 
@@ -47,7 +53,15 @@ struct ComputationConfig {
         double offset_axis_x;
         double offset_axis_y;
     } numbers_config;
+
+    struct {
+        int64_t cycle_start;
+        int64_t cycle_end;
+    } benchmark;
 };
+
+ComputationFunc BenchmarkResultPrint (FILE *benchmark_result, const int64_t cycle_start,
+                                                              const int64_t cycle_end);
 
 ComputationFunc ConfigCtor (ComputationConfig *config);
 

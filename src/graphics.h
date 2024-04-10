@@ -5,6 +5,13 @@
 
 #include "mandelbrot_computation.h"
 
+#define BENCHMARK_RES_(computation)  {                                                                           \
+                                         fprintf (benchmark_results, "Benchmark results for " computation "\n"); \
+                                         BenchmarkResultPrint (benchmark_results,                                \
+                                                               config.benchmark.cycle_start,                     \
+                                                               config.benchmark.cycle_end);                      \
+                                     }
+
 const int WINDOW_SIZE_X = 800;
 const int WINDOW_SIZE_Y = 600;
 

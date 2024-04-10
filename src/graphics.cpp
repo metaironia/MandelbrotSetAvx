@@ -19,6 +19,23 @@ GraphicsFunc MandelbrotDraw (void) {
     ComputationConfig config = {};
     ConfigCtor (&config);
 
+#ifdef BENCHMARK
+        FILE *benchmark_results = fopen ("benchmark_results.txt", "w");
+
+        MandelbrotComputeSillyNoSIMD (vmem_buffer, &config);
+        BENCHMARK_RES_ ("silly no simd computations");
+
+        MandelbrotComputeSensibleNoSIMD (vmem_buffer, &config);
+        BENCHMARK_RES_ ("sensible no simd computations");
+
+        MandelbrotComputeSIMD (vmem_buffer, &config);
+        BENCHMARK_RES_ ("simd computations");
+
+        fclose (benchmark_results);
+        benchmark_results = NULL;
+#endif
+
+#ifndef BENCHMARK
     while (!txGetAsyncKeyState (VK_ESCAPE)) {
         
         ControlButtonPressCheck (&config);
@@ -29,7 +46,8 @@ GraphicsFunc MandelbrotDraw (void) {
 
         txEnd();
     }
- 
+#endif
+
     ConfigDtor (&config);
 
     return GRAPHICS_FUNC_STATUS_OK;

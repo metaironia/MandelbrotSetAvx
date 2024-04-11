@@ -240,7 +240,7 @@ ComputationFunc MandelbrotComputeSIMD (RGBQUAD *videomem, ComputationConfig *con
             volatile __m256d x = x_0;
             volatile __m256d y = y_0;
 
-            __m256i iter_num = _mm256_set1_epi64x (0);
+            __m256d iter_num = _mm256_setzero_pd();
 
             for (size_t curr_iter = 0; curr_iter <= MAX_COMPUTATION_NUM; curr_iter++) {
                 
@@ -251,20 +251,21 @@ ComputationFunc MandelbrotComputeSIMD (RGBQUAD *videomem, ComputationConfig *con
 
                 __m256d is_dot_in = _mm256_cmp_pd (curr_x_sq_y_sq, INTR_MAND_RAD_SQ, _CMP_LT_OQ);
 
-                if (!(_mm256_movemask_pd (is_dot_in)))
+                if (!_mm256_movemask_pd (is_dot_in))
                     break;
 
                 x = _mm256_add_pd (_mm256_sub_pd (curr_x_sq, curr_y_sq),    x_0);      
                 y = _mm256_add_pd (_mm256_mul_pd (INTR_CONST_TWO, curr_xy), y_0);
 
-                __m256i sum_mask = _mm256_srli_epi64 (_mm256_castpd_si256 (is_dot_in), 8 * sizeof (double) - 1); 
-                        iter_num = _mm256_add_epi64  (sum_mask, iter_num);
+                __m256d sum_mask = _mm256_blendv_pd (_mm256_setzero_pd(), INTR_CONST_ONE, is_dot_in); 
+                        iter_num = _mm256_add_pd    (sum_mask, iter_num);
             }
+
 #ifndef BENCHMARK
-            int64_t *pixel_iter_num = (int64_t *) (&iter_num); 
+            double *pixel_iter_num = (double *) (&iter_num); 
 
             FOR_ACCUM
-                PixelColorSet (videomem, x_pixel + i, y_pixel, pixel_iter_num[i]);
+                PixelColorSet (videomem, x_pixel + i, y_pixel, (size_t) pixel_iter_num[i]);
 #endif
             x_0 = _mm256_add_pd (x_0, INTR_STEP_X_);
         }

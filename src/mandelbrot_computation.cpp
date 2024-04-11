@@ -90,16 +90,16 @@ ComputationFunc MandelbrotComputeSillyNoSIMD (RGBQUAD *videomem, ComputationConf
     for (size_t bench_iter = 0; bench_iter < BENCHMARK_COMPUTE_TIMES; bench_iter++)
 #endif
 
-    for (size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++, y_0 += NUM_DELTA_Y_) {
+    for (volatile size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++, y_0 += NUM_DELTA_Y_) {
         
         double x_0 = NUM_OFFSET_AXIS_X_;
             
-        for (size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel++, x_0 += NUM_DELTA_X_) {
+        for (volatile size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel++, x_0 += NUM_DELTA_X_) {
 
-            volatile double x = x_0;
-            volatile double y = y_0;
+            double x = x_0;
+            double y = y_0;
 
-            size_t iter_num = 0;
+            volatile size_t iter_num = 0;
 
             for (; iter_num <= MAX_COMPUTATION_NUM; iter_num++) {
 
@@ -132,7 +132,8 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem, ComputationC
     assert (videomem);
     assert (config);
 
-    double y_0 = NUM_OFFSET_AXIS_Y_;
+    double y_0[ACCUM_NUM] = {NUM_OFFSET_AXIS_Y_, NUM_OFFSET_AXIS_Y_,
+                             NUM_OFFSET_AXIS_Y_, NUM_OFFSET_AXIS_Y_};
 
 #ifdef BENCHMARK
     (config -> benchmark).cycle_start = _rdtsc();
@@ -140,37 +141,37 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem, ComputationC
     for (size_t bench_iter = 0; bench_iter < BENCHMARK_COMPUTE_TIMES; bench_iter++)
 #endif
 
-    for (size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++, y_0 += NUM_DELTA_Y_) {
+    for (volatile size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++) {
         
         double x_0[ACCUM_NUM] = {NUM_OFFSET_AXIS_X_,                    
                                  NUM_OFFSET_AXIS_X_ + NUM_DELTA_X_, 
                                  NUM_OFFSET_AXIS_X_ + NUM_DELTA_X_ * 2, 
                                  NUM_OFFSET_AXIS_X_ + NUM_DELTA_X_ * 3};
             
-        for (size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
+        for (volatile size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
 
-            volatile double x[ACCUM_NUM] = {};
-            volatile double y[ACCUM_NUM] = {};
+            double x[ACCUM_NUM] = {};
+            double y[ACCUM_NUM] = {};
 
             FOR_ACCUM
                 x[i] = x_0[i];
 
             FOR_ACCUM
-                y[i] = y_0;
+                y[i] = y_0[i];
 
-            size_t iter_num[ACCUM_NUM] = {};
-
-            int pixel_mask           = 0;
             int is_dot_in[ACCUM_NUM] = {};
 
             FOR_ACCUM
                 is_dot_in[i] = 1;
+
+            volatile size_t iter_num[ACCUM_NUM]  = {};
 
             for (size_t curr_iter = 0; curr_iter <= MAX_COMPUTATION_NUM; curr_iter++) {
                 
                 double curr_x_sq[ACCUM_NUM] = {};
                 double curr_y_sq[ACCUM_NUM] = {};
                 double curr_xy[ACCUM_NUM]   = {}; 
+                double radius_sq[ACCUM_NUM] = {};
 
                 FOR_ACCUM
                     curr_x_sq[i] = x[i] * x[i];
@@ -182,9 +183,14 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem, ComputationC
                     curr_xy[i] = x[i] * y[i];
 
                 FOR_ACCUM
-                    if ((curr_x_sq[i] + curr_y_sq[i]) > MANDELBROT_RADIUS_SQUARE)
+                    radius_sq[i] = curr_y_sq[i] + curr_x_sq[i];
+
+                FOR_ACCUM
+                    if (radius_sq[i] > MANDELBROT_RADIUS_SQUARE)
                         is_dot_in[i] = 0;
                 
+                int pixel_mask = 0;
+
                 FOR_ACCUM
                     pixel_mask |= (is_dot_in[i] << i);
 
@@ -195,7 +201,7 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem, ComputationC
                     x[i] = curr_x_sq[i] - curr_y_sq[i] + x_0[i];
                 
                 FOR_ACCUM
-                    y[i] = 2 * curr_xy[i] + y_0; 
+                    y[i] = 2 * curr_xy[i] + y_0[i]; 
 
                 FOR_ACCUM
                     iter_num[i] += is_dot_in[i];
@@ -209,6 +215,9 @@ ComputationFunc MandelbrotComputeSensibleNoSIMD (RGBQUAD *videomem, ComputationC
             FOR_ACCUM
                 x_0[i] += NUM_STEP_X_;
         }
+
+        FOR_ACCUM
+            y_0[i] += NUM_DELTA_Y_;
     }
 
 #ifdef BENCHMARK
@@ -231,16 +240,16 @@ ComputationFunc MandelbrotComputeSIMD (RGBQUAD *videomem, ComputationConfig *con
     for (size_t bench_iter = 0; bench_iter < BENCHMARK_COMPUTE_TIMES; bench_iter++)
 #endif
 
-    for (size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++) {
+    for (volatile size_t y_pixel = 0; y_pixel < WINDOW_SIZE_Y; y_pixel++) {
         
         __m256d x_0 = _mm256_add_pd (INTR_OFFSET_AXIS_X_, _mm256_mul_pd (INTR_DELTA_X_, INTR_0_TO_3));
 
-        for (size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
+        for (volatile size_t x_pixel = 0; x_pixel < WINDOW_SIZE_X; x_pixel += ACCUM_NUM) {
 
-            volatile __m256d x = x_0;
-            volatile __m256d y = y_0;
+            __m256d x = x_0;
+            __m256d y = y_0;
 
-            __m256d iter_num = _mm256_setzero_pd();
+            volatile __m256d iter_num = _mm256_setzero_pd();
 
             for (size_t curr_iter = 0; curr_iter <= MAX_COMPUTATION_NUM; curr_iter++) {
                 

@@ -16,10 +16,10 @@ ComputationFunc BenchmarkResultPrint (FILE *benchmark_result, const int64_t cycl
     const int64_t cycles_whole_computation = cycle_end - cycle_start;
 
     fprintf (benchmark_result, "Computations repeated %d times,\n"
-                               "Initial CPU cycle:         %lld\n"
-                               "End CPU cycle:             %lld\n"
-                               "Cycles to compute all:     %lld\n"
-                               "Cycles to one computation: %lg\n\n",
+                               "Initial CPU cycle:          %lld\n"
+                               "End CPU cycle:              %lld\n"
+                               "Cycles to compute all:      %lld\n"
+                               "Cycles per one computation: %lg\n\n",
                                BENCHMARK_COMPUTE_TIMES,
                                cycle_start, cycle_end,
                                cycles_whole_computation, 

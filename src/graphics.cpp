@@ -25,13 +25,13 @@ GraphicsFunc MandelbrotDraw (void) {
         RdtscTest (benchmark_results);
 
         MandelbrotComputeSillyNoSIMD (vmem_buffer, &config);
-        BENCHMARK_RES_ ("silly no simd computations");
+        BENCHMARK_RES_ ("silly no SIMD computations");
 
         MandelbrotComputeSensibleNoSIMD (vmem_buffer, &config);
-        BENCHMARK_RES_ ("sensible no simd computations");
+        BENCHMARK_RES_ ("sensible no SIMD computations");
 
         MandelbrotComputeSIMD (vmem_buffer, &config);
-        BENCHMARK_RES_ ("simd computations");
+        BENCHMARK_RES_ ("SIMD computations");
 
         fclose (benchmark_results);
         benchmark_results = NULL;

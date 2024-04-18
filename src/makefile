@@ -11,9 +11,6 @@ SOURCES= main.cpp graphics.cpp mandelbrot_computation.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=mandelbrot
 
-benchmark: CFLAGS += -DBENCHMARK
-benchmark: rebuild
-
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
@@ -21,6 +18,9 @@ $(EXECUTABLE): $(OBJECTS)
 
 %.o : %.cpp
 	$(CC) -c $(CFLAGS) $(WARNINGS) $< -o $@                    
+
+benchmark: CFLAGS += -DBENCHMARK
+benchmark: rebuild
 
 clean:
 	 rm -f *.o mandelbrot.exe

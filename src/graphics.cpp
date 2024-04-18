@@ -22,6 +22,8 @@ GraphicsFunc MandelbrotDraw (void) {
 #ifdef BENCHMARK
         FILE *benchmark_results = fopen ("benchmark_results.txt", "w");
 
+        RdtscTest (benchmark_results);
+
         MandelbrotComputeSillyNoSIMD (vmem_buffer, &config);
         BENCHMARK_RES_ ("silly no simd computations");
 
@@ -53,7 +55,7 @@ GraphicsFunc MandelbrotDraw (void) {
     return GRAPHICS_FUNC_STATUS_OK;
 }
 
-inline GraphicsFunc ControlButtonPressCheck (ComputationConfig *config) {
+GraphicsFunc ControlButtonPressCheck (ComputationConfig *config) {
 
     assert (config);
 
@@ -108,8 +110,8 @@ inline GraphicsFunc ControlButtonPressCheck (ComputationConfig *config) {
     return GRAPHICS_FUNC_STATUS_OK;
 }
 
-GraphicsFunc PixelColorSet (RGBQUAD *videomem,       size_t pixel_x, 
-                            size_t   pixel_y,  const size_t iter_num) {
+GraphicsFunc PixelColorSet (      RGBQUAD *videomem, const size_t pixel_x, 
+                            const size_t   pixel_y,  const size_t iter_num) {
 
     assert (videomem);
 
@@ -122,9 +124,9 @@ GraphicsFunc PixelColorSet (RGBQUAD *videomem,       size_t pixel_x,
         return GRAPHICS_FUNC_STATUS_OK;
     }
 
-//    current_pixel -> rgbBlue  = (BYTE) (sqrt (iter_num) * 100); 
+    current_pixel -> rgbBlue  = (BYTE) (sqrt (iter_num) * 100); 
     current_pixel -> rgbGreen = (BYTE) (sqrt (sqrt (iter_num)) * 256);
-//    current_pixel -> rgbRed   = (BYTE) (iter_num * iter_num * iter_num); 
+    current_pixel -> rgbRed   = (BYTE) (iter_num * iter_num * iter_num); 
 
     return GRAPHICS_FUNC_STATUS_OK;
 }

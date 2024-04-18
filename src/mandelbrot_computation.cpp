@@ -13,6 +13,8 @@
 ComputationFunc BenchmarkResultPrint (FILE *benchmark_result, const int64_t cycle_start,
                                                               const int64_t cycle_end) {
 
+    assert (benchmark_result);
+    
     const int64_t cycles_whole_computation = cycle_end - cycle_start;
 
     fprintf (benchmark_result, "Computations repeated %d times,\n"
@@ -24,6 +26,23 @@ ComputationFunc BenchmarkResultPrint (FILE *benchmark_result, const int64_t cycl
                                cycle_start, cycle_end,
                                cycles_whole_computation, 
                                ((double) cycles_whole_computation) / BENCHMARK_COMPUTE_TIMES);
+
+    return COMPUTATION_FUNC_STATUS_OK;
+}
+
+ComputationFunc RdtscTest (FILE *benchmark_res) {
+
+    assert (benchmark_res);
+
+    const int64_t rdtsc_cycle_start = _rdtsc(); 
+                                      _rdtsc();
+                                      _rdtsc();
+                                      _rdtsc();
+    const int64_t rdtsc_cycle_end   = _rdtsc();
+
+    const double cyc_per_rdtsc = ((double) (rdtsc_cycle_end - rdtsc_cycle_start)) / RDTSC_COMPUTE_NUM;
+
+    fprintf (benchmark_res, "Cycles per _rdtsc(): %lg\n", cyc_per_rdtsc); 
 
     return COMPUTATION_FUNC_STATUS_OK;
 }

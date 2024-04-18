@@ -14,6 +14,7 @@ enum ComputationFunc {
     COMPUTATION_FUNC_STATUS_FAIL
 };
 
+const int RDTSC_COMPUTE_NUM       = 4;
 const int BENCHMARK_COMPUTE_TIMES = 1000;
 
 const int ACCUM_NUM = 4;
@@ -64,6 +65,8 @@ struct ComputationConfig {
 
 ComputationFunc BenchmarkResultPrint (FILE *benchmark_result, const int64_t cycle_start,
                                                               const int64_t cycle_end);
+
+ComputationFunc RdtscTest (FILE *benchmark_res);
 
 ComputationFunc ConfigCtor (ComputationConfig *config);
 

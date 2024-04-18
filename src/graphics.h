@@ -23,9 +23,9 @@ enum GraphicsFunc {
 
 GraphicsFunc MandelbrotDraw (void);
 
-inline GraphicsFunc ControlButtonPressCheck (ComputationConfig *config);
+GraphicsFunc ControlButtonPressCheck (ComputationConfig *config);
 
-GraphicsFunc PixelColorSet (RGBQUAD *videomem,       size_t pixel_x, 
-                            size_t   pixel_y,  const size_t iter_num);
+GraphicsFunc PixelColorSet (      RGBQUAD *videomem, const size_t pixel_x, 
+                            const size_t   pixel_y,  const size_t iter_num);
 
 #endif
